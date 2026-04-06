@@ -10,15 +10,6 @@
       .nav-tab { cursor: pointer; padding: 12px 10px; border-bottom: 3px solid transparent; font-size: 0.875rem; transition: 0.3s; }
       .nav-tab.active { border-bottom: 3px solid #3b82f6; color: #3b82f6; font-weight: bold; background-color: white; }
       input, select, textarea { user-select: text; }
-      .name-badge {
-        display: inline-flex; align-items: center;
-        background: #eff6ff; color: #1d4ed8;
-        border: 1px solid #bfdbfe; border-radius: 9999px;
-        padding: 4px 12px; font-size: 11px; font-weight: 600;
-        cursor: pointer; transition: all 0.15s; user-select: none;
-      }
-      .name-badge:hover { background: #dbeafe; }
-      .name-badge.selected { background: #1d4ed8; color: white; border-color: #1d4ed8; }
     </style>
   </head>
   <body class="p-2 md:p-8" oncontextmenu="return false;">
@@ -53,22 +44,13 @@
           </select>
         </div>
 
-        <!-- Badge nama dari database -->
-        <div id="panelNamaDB" class="hidden bg-blue-50 p-4 rounded-2xl border border-blue-100">
-          <div class="flex justify-between items-center mb-3">
-            <span class="text-[10px] font-bold text-blue-800 uppercase tracking-wider">Pilih Nama dari Database</span>
-            <span class="text-[9px] text-blue-400 italic">klik untuk pilih/batal</span>
-          </div>
-          <div id="dbNameBadges" class="flex flex-wrap gap-2 min-h-[40px]"></div>
-        </div>
-
-        <!-- Daftar terpilih -->
+        <!-- Daftar nama (langsung dari database + bisa hapus + tambah manual) -->
         <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
           <div class="flex justify-between items-center mb-3">
-            <span class="text-[10px] font-bold text-blue-800 uppercase tracking-wider">Daftar Nama Terpilih</span>
+            <span class="text-[10px] font-bold text-blue-800 uppercase tracking-wider">Daftar Nama</span>
             <span id="countDisplay" class="bg-blue-600 text-white px-2 py-0.5 rounded-full text-[11px] font-bold">0</span>
           </div>
-          <div id="nameContainer" class="flex flex-wrap gap-2 p-3 bg-white rounded-xl border border-dashed border-blue-200 min-h-[60px] items-start"></div>
+          <div id="nameContainer" class="flex flex-wrap gap-2 p-3 bg-white rounded-xl border border-dashed border-blue-200 min-h-[80px] items-start"></div>
         </div>
 
         <button onclick="handleSubmit()" class="w-full gradient-bg text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-all">🚀 KIRIM SEKARANG</button>
@@ -108,74 +90,47 @@
         </div>
       </div>
 
-      <!-- LOADER -->
+      <!-- LOADER (hanya untuk kirim pesanan) -->
       <div id="loader" class="hidden fixed inset-0 bg-white bg-opacity-80 z-[110] flex flex-col items-center justify-center text-center">
         <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
-        <p class="mt-2 text-blue-600 text-[10px] font-bold uppercase" id="loaderText">Memproses...</p>
+        <p class="mt-2 text-blue-600 text-[10px] font-bold uppercase" id="loaderText">Mengirim...</p>
       </div>
     </div>
 
     <script>
-      // =============================================
-      // GANTI DENGAN URL GAS WEB APP KAMU
-      // =============================================
-      const GAS_URL = "https://script.google.com/macros/s/AKfycbwsnqbYQKlsYZthDJlLcNzf5nCCLMv8MDsWuSdxtwDu6xX_ZBGIGlm-kEU-54WCgPBP/exec";
+      const GAS_URL = "https://script.google.com/macros/s/AKfycbxITrkf8Xu1jkxj0YWoUl1ClRWiznagZYYXjI7M5QMof-fXk63N9ib_tlWOwEGWufqR/exec";
 
       let MASTER_DATA = {};
       let selectedNames = [];
-      let currentBidang = "";
       let isAuth = false;
 
       // =============================================
-      // HELPER: GET ke GAS
+      // LOAD DATA — langsung render tanpa loader UI
       // =============================================
-      async function gasGet(action) {
-        const res = await fetch(`${GAS_URL}?action=${action}`, { redirect: "follow" });
-        return res.json();
-      }
-
-      // =============================================
-      // HELPER: POST ke GAS
-      // =============================================
-      async function gasPost(action, data) {
-        const res = await fetch(GAS_URL, {
-          method: "POST",
-          redirect: "follow",
-          headers: { "Content-Type": "text/plain" }, // GAS butuh text/plain bukan application/json saat cross-origin
-          body: JSON.stringify({ action, data })
-        });
-        return res.json();
-      }
-
-      // =============================================
-      // LOAD DATA SAAT BUKA HALAMAN
-      // =============================================
-      window.onload = async () => {
+      window.onload = () => {
         updateClock();
-        showLoader("Memuat database...");
-        try {
-          MASTER_DATA = await gasGet("getMasterData");
-          populateBidang();
-        } catch (err) {
-          alert("Gagal memuat data. Cek koneksi internet.");
-          console.error(err);
-        }
-        hideLoader();
+        // Fetch di background, UI tetap jalan
+        fetch(`${GAS_URL}?action=getMasterData`, { redirect: "follow" })
+          .then(r => r.json())
+          .then(data => {
+            MASTER_DATA = data || {};
+            populateBidang();
+          })
+          .catch(err => console.error("Gagal load:", err));
       };
 
-      // =============================================
-      // SIMPAN KE CLOUD (async, tanpa blokir UI)
-      // =============================================
-      async function syncToCloud() {
-        try {
-          await gasPost("saveMasterData", MASTER_DATA);
-        } catch (err) {
-          console.error("Gagal sync:", err);
-        }
+      // Sync ke cloud di background — UI ga nunggu
+      function syncToCloud() {
+        fetch(GAS_URL, {
+          method: "POST",
+          redirect: "follow",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify({ action: "saveMasterData", data: MASTER_DATA })
+        }).catch(err => console.error("Gagal sync:", err));
       }
 
       // =============================================
-      // TAB NAVIGASI
+      // TAB
       // =============================================
       function switchView(v) {
         if (v === 'admin' && !isAuth) {
@@ -195,9 +150,7 @@
           isAuth = true;
           document.getElementById('passInput').value = "";
           switchView('admin');
-        } else {
-          alert("Password Salah!");
-        }
+        } else { alert("Password Salah!"); }
       }
 
       function logoutAdmin() { isAuth = false; switchView('order'); }
@@ -214,114 +167,102 @@
       }
 
       // =============================================
-      // PILIH BIDANG → TAMPIL BADGE NAMA
+      // PILIH BIDANG → semua nama dari DB langsung masuk
       // =============================================
       function handleBidangChange() {
-        currentBidang = document.getElementById('bidang').value;
-        selectedNames = [];
-        renderDBBadges();
-        renderPills();
-      }
-
-      function renderDBBadges() {
-        const panel = document.getElementById('panelNamaDB');
-        const container = document.getElementById('dbNameBadges');
-        const names = MASTER_DATA[currentBidang] || [];
-
-        if (names.length === 0) { panel.classList.add('hidden'); return; }
-        panel.classList.remove('hidden');
-        container.innerHTML = "";
-
-        names.forEach(name => {
-          const isSelected = selectedNames.includes(name);
-          const badge = document.createElement('span');
-          badge.className = 'name-badge' + (isSelected ? ' selected' : '');
-          badge.textContent = (isSelected ? '✓ ' : '') + name;
-          badge.onclick = () => toggleName(name);
-          container.appendChild(badge);
-        });
-      }
-
-      function toggleName(name) {
-        const idx = selectedNames.indexOf(name);
-        if (idx === -1) selectedNames.push(name);
-        else selectedNames.splice(idx, 1);
-        renderDBBadges();
+        const bidang = document.getElementById('bidang').value;
+        // Langsung copy semua nama dari database ke selectedNames
+        selectedNames = [...(MASTER_DATA[bidang] || [])];
         renderPills();
       }
 
       // =============================================
-      // RENDER PILLS NAMA TERPILIH
+      // RENDER PILLS — bisa hapus tiap nama
       // =============================================
       function renderPills() {
         const cont = document.getElementById('nameContainer');
         document.getElementById('countDisplay').innerText = selectedNames.length;
         cont.innerHTML = "";
-        selectedNames.forEach((n, i) => {
-          cont.innerHTML += `<div class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-xl text-[11px] font-medium flex items-center border border-blue-200">${n}<button onclick="removePill(${i})" class="ml-2 font-bold text-blue-400 hover:text-red-500 text-lg">&times;</button></div>`;
-        });
-        cont.innerHTML += `<div class="flex gap-1 items-center"><input type="text" id="manualInput" class="w-32 px-2 py-1.5 border-2 border-blue-200 rounded-xl text-[11px] outline-none" placeholder="+ Manual" onkeypress="if(event.key==='Enter') addManualName()"><button onclick="addManualName()" class="bg-blue-600 text-white px-2 py-1.5 rounded-xl text-[10px] font-bold">+</button></div>`;
-      }
 
-      function removePill(i) {
-        selectedNames.splice(i, 1);
-        renderDBBadges();
-        renderPills();
+        selectedNames.forEach((n, i) => {
+          cont.innerHTML += `
+            <div class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-xl text-[11px] font-medium flex items-center border border-blue-200">
+              ${n}
+              <button onclick="selectedNames.splice(${i},1); renderPills();" class="ml-2 font-bold text-blue-400 hover:text-red-500 text-lg leading-none">&times;</button>
+            </div>`;
+        });
+
+        // Input tambah manual
+        cont.innerHTML += `
+          <div class="flex gap-1 items-center">
+            <input type="text" id="manualInput"
+              class="w-32 px-2 py-1.5 border-2 border-blue-200 rounded-xl text-[11px] outline-none"
+              placeholder="+ Manual"
+              onkeypress="if(event.key==='Enter') addManualName()">
+            <button onclick="addManualName()" class="bg-blue-600 text-white px-2 py-1.5 rounded-xl text-[10px] font-bold">+</button>
+          </div>`;
       }
 
       function addManualName() {
         const val = document.getElementById('manualInput').value.trim();
-        if (val && !selectedNames.includes(val)) {
+        if (val) {
           selectedNames.push(val);
-          renderDBBadges();
           renderPills();
-          setTimeout(() => { const inp = document.getElementById('manualInput'); if (inp) inp.focus(); }, 50);
+          setTimeout(() => { const inp = document.getElementById('manualInput'); if (inp) inp.focus(); }, 30);
         }
       }
 
       // =============================================
       // KIRIM PESANAN
       // =============================================
-      async function handleSubmit() {
+      function handleSubmit() {
         const pic = document.getElementById('picName').value.trim();
         const phone = document.getElementById('picPhone').value.trim();
         const bidang = document.getElementById('bidang').value;
         const shift = document.getElementById('shift').value;
 
         if (!pic || !phone || !bidang || selectedNames.length === 0) {
-          return alert("Lengkapi data! Pastikan nama sudah dipilih.");
+          return alert("Lengkapi data! Pastikan nama sudah ada.");
         }
 
-        showLoader("Mengirim pesanan...");
-        try {
-          await gasPost("processForm", { pic, phone, bidang, shift, names: selectedNames });
-          hideLoader();
+        document.getElementById('loader').classList.remove('hidden');
+
+        fetch(GAS_URL, {
+          method: "POST",
+          redirect: "follow",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify({ action: "processForm", data: { pic, phone, bidang, shift, names: selectedNames } })
+        })
+        .then(r => r.json())
+        .then(() => {
+          document.getElementById('loader').classList.add('hidden');
           alert(`TERKIRIM! ✅\n${selectedNames.length} nasi untuk ${shift}`);
           selectedNames = [];
-          renderDBBadges();
           renderPills();
           document.getElementById('picName').value = "";
           document.getElementById('picPhone').value = "";
-        } catch (err) {
-          hideLoader();
+          document.getElementById('bidang').value = "";
+        })
+        .catch(err => {
+          document.getElementById('loader').classList.add('hidden');
           alert("Gagal kirim: " + err.message);
-        }
+        });
       }
 
       // =============================================
-      // ADMIN - KELOLA DATABASE
+      // ADMIN
       // =============================================
-      async function addNewBidang() {
+      function addNewBidang() {
         const val = document.getElementById('newBidangInput').value.trim().toUpperCase();
         if (!val || MASTER_DATA[val]) return;
         MASTER_DATA[val] = [];
         document.getElementById('newBidangInput').value = "";
         renderAdmin();
         populateBidang();
-        await syncToCloud();
+        syncToCloud();
       }
 
-      async function parseBulk() {
+      function parseBulk() {
         const lines = document.getElementById('bulkInput').value.split('\n');
         let added = 0;
         lines.forEach(l => {
@@ -331,39 +272,34 @@
           const nama = l.substring(dashIdx + 1).trim();
           if (!bidang || !nama) return;
           if (!MASTER_DATA[bidang]) MASTER_DATA[bidang] = [];
-          if (!MASTER_DATA[bidang].includes(nama)) {
-            MASTER_DATA[bidang].push(nama);
-            added++;
-          }
+          if (!MASTER_DATA[bidang].includes(nama)) { MASTER_DATA[bidang].push(nama); added++; }
         });
-
         document.getElementById('bulkInput').value = "";
         renderAdmin();
         populateBidang();
-
-        showLoader("Menyimpan ke database...");
-        await syncToCloud();
-        hideLoader();
-        alert(`✅ Berhasil! ${added} nama ditambahkan ke database.`);
+        syncToCloud(); // background, ga nunggu
+        alert(`✅ ${added} nama ditambahkan!`);
       }
 
       function renderAdmin() {
         const cont = document.getElementById('masterView');
         cont.innerHTML = "";
         const keys = Object.keys(MASTER_DATA).sort();
-        if (keys.length === 0) {
+        if (!keys.length) {
           cont.innerHTML = `<div class="text-center text-gray-400 text-xs py-8">Belum ada data bidang</div>`;
           return;
         }
         keys.forEach(b => {
           const safeId = b.replace(/[^a-zA-Z0-9]/g, '_');
           const namesHtml = MASTER_DATA[b].map((n, i) =>
-            `<span class="bg-gray-100 text-[9px] px-2 py-1 rounded flex items-center gap-1">${n}<button onclick="removeName('${b}',${i})" class="text-red-400 font-bold">&times;</button></span>`
+            `<span class="bg-gray-100 text-[9px] px-2 py-1 rounded flex items-center gap-1">${n}
+              <button onclick="removeName('${b}',${i})" class="text-red-400 font-bold">&times;</button>
+            </span>`
           ).join('');
           cont.innerHTML += `
             <div class="bg-white border p-3 rounded-2xl shadow-sm space-y-2">
               <div class="flex justify-between font-bold text-[10px] uppercase text-blue-900">
-                <span>${b} <span class="text-gray-400 font-normal">(${MASTER_DATA[b].length} orang)</span></span>
+                <span>${b} <span class="text-gray-400 font-normal">(${MASTER_DATA[b].length})</span></span>
                 <button onclick="deleteBidang('${b}')" class="text-red-400">Hapus</button>
               </div>
               <div class="flex gap-2">
@@ -375,52 +311,29 @@
         });
       }
 
-      async function addOneAdmin(b) {
+      function addOneAdmin(b) {
         const safeId = b.replace(/[^a-zA-Z0-9]/g, '_');
         const input = document.getElementById(`in-${safeId}`);
         const val = input ? input.value.trim() : "";
-        if (!val || MASTER_DATA[b].includes(val)) return;
-        MASTER_DATA[b].push(val);
+        if (!val) return;
+        if (!MASTER_DATA[b].includes(val)) MASTER_DATA[b].push(val);
         if (input) input.value = "";
         renderAdmin();
-        if (currentBidang === b) renderDBBadges();
-        await syncToCloud();
+        syncToCloud();
       }
 
-      async function removeName(b, i) {
-        const removed = MASTER_DATA[b][i];
+      function removeName(b, i) {
         MASTER_DATA[b].splice(i, 1);
         renderAdmin();
-        const selIdx = selectedNames.indexOf(removed);
-        if (selIdx !== -1) selectedNames.splice(selIdx, 1);
-        if (currentBidang === b) renderDBBadges();
-        renderPills();
-        await syncToCloud();
+        syncToCloud();
       }
 
-      async function deleteBidang(b) {
-        if (!confirm("Hapus bidang " + b + " beserta semua nama?")) return;
+      function deleteBidang(b) {
+        if (!confirm("Hapus bidang " + b + "?")) return;
         delete MASTER_DATA[b];
         renderAdmin();
         populateBidang();
-        if (currentBidang === b) {
-          currentBidang = "";
-          selectedNames = [];
-          document.getElementById('panelNamaDB').classList.add('hidden');
-          renderPills();
-        }
-        await syncToCloud();
-      }
-
-      // =============================================
-      // LOADER HELPER
-      // =============================================
-      function showLoader(text) {
-        document.getElementById('loaderText').textContent = text || "Memproses...";
-        document.getElementById('loader').classList.remove('hidden');
-      }
-      function hideLoader() {
-        document.getElementById('loader').classList.add('hidden');
+        syncToCloud();
       }
 
       // =============================================
