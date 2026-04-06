@@ -26,8 +26,8 @@
           <div id="clock" class="text-blue-600 font-bold text-xs mt-1"></div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input type="text" id="picName" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none" placeholder="Nama PIC">
-          <input type="tel" id="picPhone" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none" placeholder="No WA/HP">
+          <input type="text" id="picName" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-400" placeholder="Nama PIC">
+          <input type="tel" id="picPhone" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-400" placeholder="No WA/HP">
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <select id="bidang" onchange="handleBidangChange()" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none">
@@ -42,32 +42,31 @@
         </div>
         <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
           <div class="flex justify-between items-center mb-3">
-            <span class="text-[10px] font-bold text-blue-800 uppercase">Daftar Nama Terpilih</span>
+            <span class="text-[10px] font-bold text-blue-800 uppercase tracking-wider">Daftar Nama Terpilih</span>
             <span id="countDisplay" class="bg-blue-600 text-white px-2 py-0.5 rounded-full text-[11px] font-bold">0</span>
           </div>
           <div id="nameContainer" class="flex flex-wrap gap-2 p-3 bg-white rounded-xl border border-dashed border-blue-200 min-h-[100px] items-start"></div>
         </div>
-        <button onclick="handleSubmit()" class="w-full gradient-bg text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition">🚀 KIRIM SEKARANG</button>
+        <button onclick="handleSubmit()" class="w-full gradient-bg text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-all">🚀 KIRIM SEKARANG</button>
       </div>
 
       <div id="viewAdmin" class="hidden p-4 md:p-6 space-y-6">
         <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border">
-          <button onclick="logoutAdmin()" class="text-[10px] font-bold text-red-500 uppercase tracking-tighter">🚪 Logout</button>
-          <button onclick="showChangePass()" class="text-[10px] font-bold text-blue-500 uppercase tracking-tighter">🔑 Ganti Pass</button>
-          <button onclick="switchView('order')" class="text-[10px] font-bold text-gray-500 uppercase tracking-tighter">🏠 Ke Order</button>
+          <button onclick="logoutAdmin()" class="text-[10px] font-bold text-red-500 uppercase">🚪 Logout</button>
+          <button onclick="switchView('order')" class="text-[10px] font-bold text-gray-500 uppercase">🏠 Kembali</button>
         </div>
 
         <div class="bg-blue-50 p-4 rounded-2xl border border-blue-200 space-y-3">
           <h3 class="text-[10px] font-bold text-blue-800 uppercase">Tambah Bidang Baru</h3>
           <div class="flex gap-2">
-            <input type="text" id="newBidangInput" class="flex-1 px-4 py-2 border rounded-xl text-xs outline-none" placeholder="Nama Unit">
+            <input type="text" id="newBidangInput" class="flex-1 px-4 py-2 border rounded-xl text-xs outline-none" placeholder="Contoh: LOGISTIK">
             <button onclick="addNewBidang()" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase">Tambah</button>
           </div>
         </div>
 
         <div class="bg-gray-100 p-4 rounded-2xl border border-gray-200 space-y-3">
-          <h3 class="text-[10px] font-bold text-gray-600 uppercase">Input Masal (Format: Bidang - Nama)</h3>
-          <textarea id="bulkInput" rows="3" class="w-full p-3 border rounded-xl text-xs outline-none" placeholder="Contoh:&#10;HRD - Budi&#10;IT - Andi"></textarea>
+          <h3 class="text-[10px] font-bold text-gray-600 uppercase">Input Masal (Bidang - Nama)</h3>
+          <textarea id="bulkInput" rows="3" class="w-full p-3 border rounded-xl text-xs outline-none" placeholder="IT - Budi&#10;HRD - Siti"></textarea>
           <button onclick="parseBulk()" class="w-full bg-gray-600 text-white py-2 rounded-xl text-xs font-bold uppercase">Proses Masal</button>
         </div>
 
@@ -77,37 +76,35 @@
       <div id="loginModal" class="hidden absolute inset-0 bg-white bg-opacity-95 z-50 flex items-center justify-center p-6 text-center">
         <div class="w-full max-w-xs space-y-4">
           <div class="text-4xl">🔐</div>
-          <h3 class="font-bold text-gray-800 uppercase text-sm tracking-widest">Verifikasi Admin</h3>
-          <input type="password" id="passInput" class="w-full p-3 border rounded-xl text-center outline-none focus:ring-2 focus:ring-blue-400" placeholder="••••••••">
-          <button onclick="checkPass()" class="w-full py-3 bg-blue-600 text-white rounded-xl font-bold uppercase shadow-lg">Masuk</button>
-        </div>
-      </div>
-
-      <div id="changePassModal" class="hidden absolute inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-6 text-center">
-        <div class="bg-white w-full max-w-xs p-6 rounded-2xl space-y-4">
-          <h3 class="font-bold text-sm uppercase">Ganti Password Admin</h3>
-          <input type="password" id="newPassInput" class="w-full p-3 border rounded-xl text-center outline-none" placeholder="Password Baru">
-          <div class="flex gap-2">
-            <button onclick="closeChangePass()" class="flex-1 py-2 bg-gray-100 rounded-xl text-xs uppercase">Batal</button>
-            <button onclick="updatePassword()" class="flex-1 py-2 bg-green-600 text-white rounded-xl text-xs font-bold uppercase">Simpan</button>
-          </div>
+          <h3 class="font-bold text-gray-800 uppercase text-sm">Verifikasi Admin</h3>
+          <input type="password" id="passInput" class="w-full p-3 border rounded-xl text-center outline-none focus:ring-2 focus:ring-blue-400" placeholder="Password">
+          <button onclick="checkPass()" class="w-full py-3 bg-blue-600 text-white rounded-xl font-bold uppercase">Masuk</button>
         </div>
       </div>
 
       <div id="loader" class="hidden fixed inset-0 bg-white bg-opacity-80 z-[110] flex flex-col items-center justify-center text-center">
         <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
-        <p class="mt-2 text-blue-600 text-[10px] font-bold uppercase tracking-widest">Mengirim...</p>
+        <p class="mt-2 text-blue-600 text-[10px] font-bold uppercase">Memproses...</p>
       </div>
     </div>
 
     <script>
-      const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9UTFUqod6mjRgW0TRnD0DM_a3HSIT1eCxL4ipTZRS1QSLR_EOVGYz3TY1wyWkedwc/exec";
-      let MASTER_DATA = { "IT SUPPORT": ["Andi Wijaya", "Budi Santoso"], "HRD": ["Siti Aminah"] };
-      let currentAdminPass = "admin123";
+      let MASTER_DATA = {};
       let selectedNames = [];
       let isAuth = false;
 
-      window.onload = () => { updateClock(); populateBidang(); renderPills(); };
+      // Load Data Awal
+      window.onload = () => { 
+        updateClock(); 
+        google.script.run.withSuccessHandler(data => {
+          MASTER_DATA = data || {};
+          populateBidang();
+        }).getMasterData();
+      };
+
+      function syncToCloud() {
+        google.script.run.saveMasterData(MASTER_DATA);
+      }
 
       function switchView(v) {
         if(v === 'admin' && !isAuth) { document.getElementById('loginModal').classList.remove('hidden'); return; }
@@ -115,21 +112,33 @@
         document.getElementById('viewOrder').classList.toggle('hidden', v !== 'order');
         document.getElementById('viewAdmin').classList.toggle('hidden', v !== 'admin');
         if(v === 'admin') renderAdmin();
+        
+        // Update tab styling
+        document.getElementById('tabOrder').classList.toggle('active', v === 'order');
+        document.getElementById('tabAdmin').classList.toggle('active', v === 'admin');
       }
 
-      function checkPass() { if(document.getElementById('passInput').value === currentAdminPass) { isAuth = true; document.getElementById('passInput').value = ""; switchView('admin'); } else { alert("Password Salah!"); } }
+      function checkPass() {
+        if(document.getElementById('passInput').value === "admin123") { 
+          isAuth = true; 
+          document.getElementById('passInput').value = ""; 
+          switchView('admin'); 
+        } else { alert("Password Salah!"); }
+      }
+
       function logoutAdmin() { isAuth = false; switchView('order'); }
-      function showChangePass() { document.getElementById('changePassModal').classList.remove('hidden'); }
-      function closeChangePass() { document.getElementById('changePassModal').classList.add('hidden'); }
-      function updatePassword() { const p = document.getElementById('newPassInput').value; if(p) { currentAdminPass = p; alert("Password Diganti!"); closeChangePass(); } }
+
       function populateBidang() {
         const sel = document.getElementById('bidang');
         sel.innerHTML = '<option value="" disabled selected>-- Pilih Bidang --</option>';
-        Object.keys(MASTER_DATA).sort().forEach(b => { sel.innerHTML += `<option value="${b}">${b}</option>`; });
+        Object.keys(MASTER_DATA).sort().forEach(b => { 
+          sel.innerHTML += `<option value="${b}">${b}</option>`; 
+        });
       }
 
       function handleBidangChange() {
-        selectedNames = [...(MASTER_DATA[document.getElementById('bidang').value] || [])];
+        const val = document.getElementById('bidang').value;
+        selectedNames = [...(MASTER_DATA[val] || [])];
         renderPills();
       }
 
@@ -140,7 +149,7 @@
         selectedNames.forEach((n, i) => {
           cont.innerHTML += `<div class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-xl text-[11px] font-medium flex items-center border border-blue-200">${n} <button onclick="selectedNames.splice(${i}, 1); renderPills();" class="ml-2 font-bold text-blue-400 hover:text-red-500 text-lg">&times;</button></div>`;
         });
-        cont.innerHTML += `<div class="flex gap-1 items-center"><input type="text" id="manualInput" class="w-32 px-2 py-1.5 border-2 border-blue-200 rounded-xl text-[11px] outline-none" placeholder="+ Nama Manual" onkeypress="if(event.key === 'Enter') addManualName()"><button onclick="addManualName()" class="bg-blue-600 text-white px-2 py-1.5 rounded-xl text-[10px] font-bold shadow-sm">+</button></div>`;
+        cont.innerHTML += `<div class="flex gap-1 items-center"><input type="text" id="manualInput" class="w-32 px-2 py-1.5 border-2 border-blue-200 rounded-xl text-[11px] outline-none" placeholder="+ Manual" onkeypress="if(event.key === 'Enter') addManualName()"><button onclick="addManualName()" class="bg-blue-600 text-white px-2 py-1.5 rounded-xl text-[10px] font-bold">+</button></div>`;
       }
 
       function addManualName() {
@@ -148,9 +157,16 @@
         if(val) { selectedNames.push(val); renderPills(); document.getElementById('manualInput').focus(); }
       }
 
+      // Admin Management
       function addNewBidang() {
         const val = document.getElementById('newBidangInput').value.trim().toUpperCase();
-        if(val && !MASTER_DATA[val]) { MASTER_DATA[val] = []; document.getElementById('newBidangInput').value = ""; renderAdmin(); populateBidang(); }
+        if(val && !MASTER_DATA[val]) { 
+          MASTER_DATA[val] = []; 
+          syncToCloud();
+          renderAdmin(); 
+          populateBidang();
+          document.getElementById('newBidangInput').value = "";
+        }
       }
 
       function parseBulk() {
@@ -163,38 +179,74 @@
             if(!MASTER_DATA[bidang].includes(n)) MASTER_DATA[bidang].push(n);
           }
         });
-        renderAdmin(); populateBidang(); document.getElementById('bulkInput').value = ""; alert("Berhasil Diimpor!");
+        syncToCloud();
+        renderAdmin(); 
+        populateBidang(); 
+        document.getElementById('bulkInput').value = "";
+        alert("Berhasil Diupdate!");
       }
 
       function renderAdmin() {
         const cont = document.getElementById('masterView');
         cont.innerHTML = "";
         Object.keys(MASTER_DATA).sort().forEach(b => {
-          let namesHtml = MASTER_DATA[b].map((n, i) => `<span class="bg-gray-100 text-[9px] px-2 py-1 rounded flex items-center shadow-sm">${n} <button onclick="MASTER_DATA['${b}'].splice(${i},1); renderAdmin();" class="ml-1 text-red-400 font-bold">&times;</button></span>`).join('');
-          cont.innerHTML += `<div class="bg-white border p-3 rounded-2xl shadow-sm space-y-2"><div class="flex justify-between font-bold text-[10px] uppercase text-blue-900"><span>${b}</span><button onclick="delete MASTER_DATA['${b}']; renderAdmin(); populateBidang();" class="text-red-400 font-bold uppercase">Hapus</button></div><div class="flex gap-2"><input type="text" id="in-${b.replace(/\s+/g, '-')}" class="flex-1 px-2 py-1 border rounded-lg text-xs outline-none" placeholder="Nama..." onkeypress="if(event.key==='Enter') addOneAdmin('${b}')"><button onclick="addOneAdmin('${b}')" class="bg-blue-600 text-white px-2 rounded-lg text-xs font-bold">+</button></div><div class="flex flex-wrap gap-1">${namesHtml}</div></div>`;
+          let namesHtml = MASTER_DATA[b].map((n, i) => `<span class="bg-gray-100 text-[9px] px-2 py-1 rounded flex items-center">${n} <button onclick="removeName('${b}', ${i})" class="ml-1 text-red-400 font-bold">&times;</button></span>`).join('');
+          cont.innerHTML += `
+            <div class="bg-white border p-3 rounded-2xl shadow-sm space-y-2">
+              <div class="flex justify-between font-bold text-[10px] uppercase text-blue-900">
+                <span>${b}</span>
+                <button onclick="deleteBidang('${b}')" class="text-red-400">Hapus Bidang</button>
+              </div>
+              <div class="flex gap-2">
+                <input type="text" id="in-${b.replace(/\s+/g, '-')}" class="flex-1 px-2 py-1 border rounded-lg text-xs outline-none" placeholder="Tambah nama...">
+                <button onclick="addOneAdmin('${b}')" class="bg-blue-600 text-white px-2 rounded-lg text-xs font-bold">+</button>
+              </div>
+              <div class="flex flex-wrap gap-1">${namesHtml}</div>
+            </div>`;
         });
       }
 
       function addOneAdmin(b) {
-        const v = document.getElementById(`in-${b.replace(/\s+/g, '-')}`).value;
-        if(v) { MASTER_DATA[b].push(v); renderAdmin(); }
+        const input = document.getElementById(`in-${b.replace(/\s+/g, '-')}`);
+        if(input.value) { 
+          MASTER_DATA[b].push(input.value); 
+          syncToCloud(); 
+          renderAdmin(); 
+        }
       }
 
-      async function handleSubmit() {
+      function removeName(b, i) {
+        MASTER_DATA[b].splice(i, 1);
+        syncToCloud();
+        renderAdmin();
+      }
+
+      function deleteBidang(b) {
+        if(confirm("Hapus " + b + "?")) {
+          delete MASTER_DATA[b];
+          syncToCloud();
+          renderAdmin();
+          populateBidang();
+        }
+      }
+
+      function handleSubmit() {
         const pic = document.getElementById('picName').value.trim();
         const phone = document.getElementById('picPhone').value.trim();
         const bidang = document.getElementById('bidang').value;
         const shift = document.getElementById('shift').value;
         if(!pic || !phone || !bidang || selectedNames.length === 0) return alert("Lengkapi data!");
+        
         document.getElementById('loader').classList.remove('hidden');
-        const params = new URLSearchParams({ action: "submit", pic, phone, bidang, shift, names: JSON.stringify(selectedNames), timestamp: new Date().toLocaleString('id-ID') });
-        fetch(APPS_SCRIPT_URL + "?" + params.toString(), { method: "GET", mode: "no-cors" });
-        setTimeout(() => {
+        const formData = { pic, phone, bidang, shift, names: selectedNames };
+        
+        google.script.run.withSuccessHandler(() => {
           document.getElementById('loader').classList.add('hidden');
           alert("TERKIRIM! ✅");
           selectedNames = []; renderPills();
-          document.getElementById('picName').value = ""; document.getElementById('picPhone').value = "";
-        }, 800);
+          document.getElementById('picName').value = ""; 
+          document.getElementById('picPhone').value = "";
+        }).processForm(formData);
       }
 
       function updateClock() { document.getElementById('clock').innerHTML = new Date().toLocaleString('id-ID'); }
