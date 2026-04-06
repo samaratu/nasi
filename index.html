@@ -10,48 +10,26 @@
       .nav-tab { cursor: pointer; padding: 12px 10px; border-bottom: 3px solid transparent; font-size: 0.875rem; transition: 0.3s; }
       .nav-tab.active { border-bottom: 3px solid #3b82f6; color: #3b82f6; font-weight: bold; background-color: white; }
       input, select, textarea { user-select: text; }
-
-      /* ===========================
-         BADGE NAMA DARI DATABASE
-         =========================== */
       .name-badge {
-        display: inline-flex;
-        align-items: center;
-        background: #eff6ff;
-        color: #1d4ed8;
-        border: 1px solid #bfdbfe;
-        border-radius: 9999px;
-        padding: 4px 10px;
-        font-size: 11px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.15s;
-        user-select: none;
+        display: inline-flex; align-items: center;
+        background: #eff6ff; color: #1d4ed8;
+        border: 1px solid #bfdbfe; border-radius: 9999px;
+        padding: 4px 12px; font-size: 11px; font-weight: 600;
+        cursor: pointer; transition: all 0.15s; user-select: none;
       }
-      .name-badge:hover { background: #dbeafe; transform: scale(1.03); }
-      .name-badge.selected {
-        background: #1d4ed8;
-        color: white;
-        border-color: #1d4ed8;
-      }
-      .name-badge.selected:hover { background: #1e3a8a; }
-
-      /* Skeleton loader */
-      .skeleton { background: linear-gradient(90deg, #e2e8f0 25%, #f8fafc 50%, #e2e8f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 9999px; height: 28px; width: 80px; display: inline-block; }
-      @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+      .name-badge:hover { background: #dbeafe; }
+      .name-badge.selected { background: #1d4ed8; color: white; border-color: #1d4ed8; }
     </style>
   </head>
   <body class="p-2 md:p-8" oncontextmenu="return false;">
     <div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden mb-10 relative">
-      
+
       <div class="flex border-b border-gray-100 bg-gray-50">
         <div id="tabOrder" onclick="switchView('order')" class="nav-tab active flex-1 text-center">🛒 Order Makan</div>
         <div id="tabAdmin" onclick="switchView('admin')" class="nav-tab flex-1 text-center font-semibold text-gray-500">🔒 Database Karyawan</div>
       </div>
 
-      <!-- ========================================
-           VIEW ORDER
-           ======================================== -->
+      <!-- VIEW ORDER -->
       <div id="viewOrder" class="p-4 md:p-6 space-y-6">
         <div class="text-center">
           <h2 class="text-xl font-bold text-gray-800">Form Pemesanan</h2>
@@ -75,27 +53,16 @@
           </select>
         </div>
 
-        <!-- ========================================
-             PANEL NAMA DARI DATABASE (KLIK TOGGLE)
-             ======================================== -->
+        <!-- Badge nama dari database -->
         <div id="panelNamaDB" class="hidden bg-blue-50 p-4 rounded-2xl border border-blue-100">
           <div class="flex justify-between items-center mb-3">
-            <span class="text-[10px] font-bold text-blue-800 uppercase tracking-wider">
-              Pilih Nama dari Database
-            </span>
-            <span class="text-[9px] text-blue-500 italic">klik nama untuk pilih/hapus</span>
+            <span class="text-[10px] font-bold text-blue-800 uppercase tracking-wider">Pilih Nama dari Database</span>
+            <span class="text-[9px] text-blue-400 italic">klik untuk pilih/batal</span>
           </div>
-          <!-- Nama dari database ditampilkan sebagai badge klik -->
-          <div id="dbNameBadges" class="flex flex-wrap gap-2 min-h-[40px]">
-            <span class="skeleton"></span>
-            <span class="skeleton"></span>
-            <span class="skeleton"></span>
-          </div>
+          <div id="dbNameBadges" class="flex flex-wrap gap-2 min-h-[40px]"></div>
         </div>
 
-        <!-- ========================================
-             DAFTAR NAMA TERPILIH + INPUT MANUAL
-             ======================================== -->
+        <!-- Daftar terpilih -->
         <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
           <div class="flex justify-between items-center mb-3">
             <span class="text-[10px] font-bold text-blue-800 uppercase tracking-wider">Daftar Nama Terpilih</span>
@@ -107,9 +74,7 @@
         <button onclick="handleSubmit()" class="w-full gradient-bg text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-all">🚀 KIRIM SEKARANG</button>
       </div>
 
-      <!-- ========================================
-           VIEW ADMIN
-           ======================================== -->
+      <!-- VIEW ADMIN -->
       <div id="viewAdmin" class="hidden p-4 md:p-6 space-y-6">
         <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border">
           <button onclick="logoutAdmin()" class="text-[10px] font-bold text-red-500 uppercase">🚪 Logout</button>
@@ -126,16 +91,14 @@
 
         <div class="bg-gray-100 p-4 rounded-2xl border border-gray-200 space-y-3">
           <h3 class="text-[10px] font-bold text-gray-600 uppercase">Input Masal (Bidang - Nama)</h3>
-          <textarea id="bulkInput" rows="3" class="w-full p-3 border rounded-xl text-xs outline-none" placeholder="IT - Budi&#10;HRD - Siti"></textarea>
+          <textarea id="bulkInput" rows="4" class="w-full p-3 border rounded-xl text-xs outline-none" placeholder="IT - Budi&#10;HRD - Siti&#10;LOGISTIK - Ahmad"></textarea>
           <button onclick="parseBulk()" class="w-full bg-gray-600 text-white py-2 rounded-xl text-xs font-bold uppercase">Proses Masal</button>
         </div>
 
         <div id="masterView" class="space-y-4 max-h-[40vh] overflow-y-auto pr-1"></div>
       </div>
 
-      <!-- ========================================
-           LOGIN MODAL
-           ======================================== -->
+      <!-- LOGIN MODAL -->
       <div id="loginModal" class="hidden absolute inset-0 bg-white bg-opacity-95 z-50 flex items-center justify-center p-6 text-center">
         <div class="w-full max-w-xs space-y-4">
           <div class="text-4xl">🔐</div>
@@ -145,54 +108,75 @@
         </div>
       </div>
 
-      <!-- ========================================
-           LOADER
-           ======================================== -->
+      <!-- LOADER -->
       <div id="loader" class="hidden fixed inset-0 bg-white bg-opacity-80 z-[110] flex flex-col items-center justify-center text-center">
         <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
-        <p class="mt-2 text-blue-600 text-[10px] font-bold uppercase">Memproses...</p>
+        <p class="mt-2 text-blue-600 text-[10px] font-bold uppercase" id="loaderText">Memproses...</p>
       </div>
     </div>
 
     <script>
-      // ==========================================
-      // STATE APLIKASI
-      // ==========================================
-      let MASTER_DATA = {};        // Data dari cloud (Google Sheets)
-      let selectedNames = [];      // Nama yang sudah dipilih untuk dikirim
-      let isAuth = false;
+      // =============================================
+      // GANTI DENGAN URL GAS WEB APP KAMU
+      // =============================================
+      const GAS_URL = "https://script.google.com/macros/s/AKfycbwsnqbYQKlsYZthDJlLcNzf5nCCLMv8MDsWuSdxtwDu6xX_ZBGIGlm-kEU-54WCgPBP/exec";
+
+      let MASTER_DATA = {};
+      let selectedNames = [];
       let currentBidang = "";
+      let isAuth = false;
 
-      // ==========================================
-      // INISIALISASI - Load data dari Google Sheets
-      // Data disimpan di MASTER_DATA dan langsung
-      // dirender ke badge nama (permanen di UI)
-      // ==========================================
-      window.onload = () => {
-        updateClock();
-        google.script.run
-          .withSuccessHandler(data => {
-            MASTER_DATA = data || {};
-            populateBidang();         // Isi dropdown bidang
-            // Nama dari database sudah siap, akan tampil saat bidang dipilih
-          })
-          .withFailureHandler(err => {
-            console.error("Gagal load data:", err);
-            alert("Gagal memuat data. Coba refresh halaman.");
-          })
-          .getMasterData();
-      };
-
-      // Simpan ke cloud & update lokal secara bersamaan
-      function syncToCloud() {
-        google.script.run
-          .withFailureHandler(err => console.error("Gagal sync:", err))
-          .saveMasterData(MASTER_DATA);
+      // =============================================
+      // HELPER: GET ke GAS
+      // =============================================
+      async function gasGet(action) {
+        const res = await fetch(`${GAS_URL}?action=${action}`, { redirect: "follow" });
+        return res.json();
       }
 
-      // ==========================================
-      // NAVIGASI TAB
-      // ==========================================
+      // =============================================
+      // HELPER: POST ke GAS
+      // =============================================
+      async function gasPost(action, data) {
+        const res = await fetch(GAS_URL, {
+          method: "POST",
+          redirect: "follow",
+          headers: { "Content-Type": "text/plain" }, // GAS butuh text/plain bukan application/json saat cross-origin
+          body: JSON.stringify({ action, data })
+        });
+        return res.json();
+      }
+
+      // =============================================
+      // LOAD DATA SAAT BUKA HALAMAN
+      // =============================================
+      window.onload = async () => {
+        updateClock();
+        showLoader("Memuat database...");
+        try {
+          MASTER_DATA = await gasGet("getMasterData");
+          populateBidang();
+        } catch (err) {
+          alert("Gagal memuat data. Cek koneksi internet.");
+          console.error(err);
+        }
+        hideLoader();
+      };
+
+      // =============================================
+      // SIMPAN KE CLOUD (async, tanpa blokir UI)
+      // =============================================
+      async function syncToCloud() {
+        try {
+          await gasPost("saveMasterData", MASTER_DATA);
+        } catch (err) {
+          console.error("Gagal sync:", err);
+        }
+      }
+
+      // =============================================
+      // TAB NAVIGASI
+      // =============================================
       function switchView(v) {
         if (v === 'admin' && !isAuth) {
           document.getElementById('loginModal').classList.remove('hidden');
@@ -218,9 +202,9 @@
 
       function logoutAdmin() { isAuth = false; switchView('order'); }
 
-      // ==========================================
+      // =============================================
       // DROPDOWN BIDANG
-      // ==========================================
+      // =============================================
       function populateBidang() {
         const sel = document.getElementById('bidang');
         sel.innerHTML = '<option value="" disabled selected>-- Pilih Bidang --</option>';
@@ -229,33 +213,22 @@
         });
       }
 
-      // ==========================================
-      // HANDLE PILIH BIDANG
-      // Render badge nama dari database MASTER_DATA
-      // yang sudah di-load sebelumnya (permanen di memori)
-      // ==========================================
+      // =============================================
+      // PILIH BIDANG → TAMPIL BADGE NAMA
+      // =============================================
       function handleBidangChange() {
         currentBidang = document.getElementById('bidang').value;
-        selectedNames = []; // Reset pilihan
-        renderDBBadges();   // Tampilkan nama dari database
-        renderPills();      // Update daftar terpilih
+        selectedNames = [];
+        renderDBBadges();
+        renderPills();
       }
 
-      // ==========================================
-      // RENDER BADGE NAMA DARI DATABASE
-      // Badge bisa diklik untuk pilih / batal pilih
-      // ==========================================
       function renderDBBadges() {
         const panel = document.getElementById('panelNamaDB');
         const container = document.getElementById('dbNameBadges');
-
         const names = MASTER_DATA[currentBidang] || [];
 
-        if (names.length === 0) {
-          panel.classList.add('hidden');
-          return;
-        }
-
+        if (names.length === 0) { panel.classList.add('hidden'); return; }
         panel.classList.remove('hidden');
         container.innerHTML = "";
 
@@ -269,46 +242,27 @@
         });
       }
 
-      // Toggle: tambah atau hapus nama dari daftar terpilih
       function toggleName(name) {
         const idx = selectedNames.indexOf(name);
-        if (idx === -1) {
-          selectedNames.push(name);
-        } else {
-          selectedNames.splice(idx, 1);
-        }
-        renderDBBadges(); // Refresh badge (update tampilan selected)
-        renderPills();    // Refresh daftar terpilih
+        if (idx === -1) selectedNames.push(name);
+        else selectedNames.splice(idx, 1);
+        renderDBBadges();
+        renderPills();
       }
 
-      // ==========================================
-      // RENDER DAFTAR NAMA TERPILIH (PILLS)
-      // ==========================================
+      // =============================================
+      // RENDER PILLS NAMA TERPILIH
+      // =============================================
       function renderPills() {
         const cont = document.getElementById('nameContainer');
         document.getElementById('countDisplay').innerText = selectedNames.length;
         cont.innerHTML = "";
-
         selectedNames.forEach((n, i) => {
-          cont.innerHTML += `
-            <div class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-xl text-[11px] font-medium flex items-center border border-blue-200">
-              ${n}
-              <button onclick="removePill(${i})" class="ml-2 font-bold text-blue-400 hover:text-red-500 text-lg">&times;</button>
-            </div>`;
+          cont.innerHTML += `<div class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-xl text-[11px] font-medium flex items-center border border-blue-200">${n}<button onclick="removePill(${i})" class="ml-2 font-bold text-blue-400 hover:text-red-500 text-lg">&times;</button></div>`;
         });
-
-        // Input manual tetap ada
-        cont.innerHTML += `
-          <div class="flex gap-1 items-center">
-            <input type="text" id="manualInput" 
-              class="w-32 px-2 py-1.5 border-2 border-blue-200 rounded-xl text-[11px] outline-none" 
-              placeholder="+ Manual" 
-              onkeypress="if(event.key==='Enter') addManualName()">
-            <button onclick="addManualName()" class="bg-blue-600 text-white px-2 py-1.5 rounded-xl text-[10px] font-bold">+</button>
-          </div>`;
+        cont.innerHTML += `<div class="flex gap-1 items-center"><input type="text" id="manualInput" class="w-32 px-2 py-1.5 border-2 border-blue-200 rounded-xl text-[11px] outline-none" placeholder="+ Manual" onkeypress="if(event.key==='Enter') addManualName()"><button onclick="addManualName()" class="bg-blue-600 text-white px-2 py-1.5 rounded-xl text-[10px] font-bold">+</button></div>`;
       }
 
-      // Hapus pill (termasuk de-select badge jika ada di DB)
       function removePill(i) {
         selectedNames.splice(i, 1);
         renderDBBadges();
@@ -321,115 +275,99 @@
           selectedNames.push(val);
           renderDBBadges();
           renderPills();
-          // Fokus ulang ke input manual
-          setTimeout(() => {
-            const inp = document.getElementById('manualInput');
-            if (inp) inp.focus();
-          }, 50);
+          setTimeout(() => { const inp = document.getElementById('manualInput'); if (inp) inp.focus(); }, 50);
         }
       }
 
-      // ==========================================
+      // =============================================
       // KIRIM PESANAN
-      // ==========================================
-      function handleSubmit() {
+      // =============================================
+      async function handleSubmit() {
         const pic = document.getElementById('picName').value.trim();
         const phone = document.getElementById('picPhone').value.trim();
         const bidang = document.getElementById('bidang').value;
         const shift = document.getElementById('shift').value;
 
         if (!pic || !phone || !bidang || selectedNames.length === 0) {
-          return alert("Lengkapi data! Pastikan nama karyawan sudah dipilih.");
+          return alert("Lengkapi data! Pastikan nama sudah dipilih.");
         }
 
-        document.getElementById('loader').classList.remove('hidden');
-        const formData = { pic, phone, bidang, shift, names: selectedNames };
-
-        google.script.run
-          .withSuccessHandler(() => {
-            document.getElementById('loader').classList.add('hidden');
-            alert("TERKIRIM! ✅\n" + selectedNames.length + " nasi untuk " + shift);
-            selectedNames = [];
-            renderDBBadges();
-            renderPills();
-            document.getElementById('picName').value = "";
-            document.getElementById('picPhone').value = "";
-          })
-          .withFailureHandler(err => {
-            document.getElementById('loader').classList.add('hidden');
-            alert("Gagal kirim: " + err.message);
-          })
-          .processForm(formData);
+        showLoader("Mengirim pesanan...");
+        try {
+          await gasPost("processForm", { pic, phone, bidang, shift, names: selectedNames });
+          hideLoader();
+          alert(`TERKIRIM! ✅\n${selectedNames.length} nasi untuk ${shift}`);
+          selectedNames = [];
+          renderDBBadges();
+          renderPills();
+          document.getElementById('picName').value = "";
+          document.getElementById('picPhone').value = "";
+        } catch (err) {
+          hideLoader();
+          alert("Gagal kirim: " + err.message);
+        }
       }
 
-      // ==========================================
+      // =============================================
       // ADMIN - KELOLA DATABASE
-      // ==========================================
-      function addNewBidang() {
+      // =============================================
+      async function addNewBidang() {
         const val = document.getElementById('newBidangInput').value.trim().toUpperCase();
-        if (val && !MASTER_DATA[val]) {
-          MASTER_DATA[val] = [];
-          syncToCloud();
-          renderAdmin();
-          populateBidang();
-          document.getElementById('newBidangInput').value = "";
-        }
+        if (!val || MASTER_DATA[val]) return;
+        MASTER_DATA[val] = [];
+        document.getElementById('newBidangInput').value = "";
+        renderAdmin();
+        populateBidang();
+        await syncToCloud();
       }
 
-      function parseBulk() {
+      async function parseBulk() {
         const lines = document.getElementById('bulkInput').value.split('\n');
         let added = 0;
         lines.forEach(l => {
-          if (l.includes('-')) {
-            const parts = l.split('-');
-            const bidang = parts[0].trim().toUpperCase();
-            const nama = parts.slice(1).join('-').trim(); // Handle nama dengan tanda '-'
-            if (bidang && nama) {
-              if (!MASTER_DATA[bidang]) MASTER_DATA[bidang] = [];
-              if (!MASTER_DATA[bidang].includes(nama)) {
-                MASTER_DATA[bidang].push(nama);
-                added++;
-              }
-            }
+          const dashIdx = l.indexOf('-');
+          if (dashIdx === -1) return;
+          const bidang = l.substring(0, dashIdx).trim().toUpperCase();
+          const nama = l.substring(dashIdx + 1).trim();
+          if (!bidang || !nama) return;
+          if (!MASTER_DATA[bidang]) MASTER_DATA[bidang] = [];
+          if (!MASTER_DATA[bidang].includes(nama)) {
+            MASTER_DATA[bidang].push(nama);
+            added++;
           }
         });
-        syncToCloud();
+
+        document.getElementById('bulkInput').value = "";
         renderAdmin();
         populateBidang();
-        document.getElementById('bulkInput').value = "";
-        alert("Berhasil! " + added + " nama ditambahkan.");
+
+        showLoader("Menyimpan ke database...");
+        await syncToCloud();
+        hideLoader();
+        alert(`✅ Berhasil! ${added} nama ditambahkan ke database.`);
       }
 
       function renderAdmin() {
         const cont = document.getElementById('masterView');
         cont.innerHTML = "";
-        const sortedKeys = Object.keys(MASTER_DATA).sort();
-
-        if (sortedKeys.length === 0) {
+        const keys = Object.keys(MASTER_DATA).sort();
+        if (keys.length === 0) {
           cont.innerHTML = `<div class="text-center text-gray-400 text-xs py-8">Belum ada data bidang</div>`;
           return;
         }
-
-        sortedKeys.forEach(b => {
-          const safeId = b.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '_');
-          let namesHtml = MASTER_DATA[b].map((n, i) =>
-            `<span class="bg-gray-100 text-[9px] px-2 py-1 rounded flex items-center gap-1">
-              ${n}
-              <button onclick="removeName('${b}', ${i})" class="text-red-400 font-bold hover:text-red-600">&times;</button>
-            </span>`
+        keys.forEach(b => {
+          const safeId = b.replace(/[^a-zA-Z0-9]/g, '_');
+          const namesHtml = MASTER_DATA[b].map((n, i) =>
+            `<span class="bg-gray-100 text-[9px] px-2 py-1 rounded flex items-center gap-1">${n}<button onclick="removeName('${b}',${i})" class="text-red-400 font-bold">&times;</button></span>`
           ).join('');
-
           cont.innerHTML += `
             <div class="bg-white border p-3 rounded-2xl shadow-sm space-y-2">
               <div class="flex justify-between font-bold text-[10px] uppercase text-blue-900">
                 <span>${b} <span class="text-gray-400 font-normal">(${MASTER_DATA[b].length} orang)</span></span>
-                <button onclick="deleteBidang('${b}')" class="text-red-400 hover:text-red-600">Hapus Bidang</button>
+                <button onclick="deleteBidang('${b}')" class="text-red-400">Hapus</button>
               </div>
               <div class="flex gap-2">
-                <input type="text" id="in-${safeId}" 
-                  class="flex-1 px-2 py-1 border rounded-lg text-xs outline-none" 
-                  placeholder="Tambah nama..."
-                  onkeypress="if(event.key==='Enter') addOneAdmin('${b}')">
+                <input type="text" id="in-${safeId}" class="flex-1 px-2 py-1 border rounded-lg text-xs outline-none" placeholder="Tambah nama..." onkeypress="if(event.key==='Enter') addOneAdmin('${b}')">
                 <button onclick="addOneAdmin('${b}')" class="bg-blue-600 text-white px-2 rounded-lg text-xs font-bold">+</button>
               </div>
               <div class="flex flex-wrap gap-1">${namesHtml}</div>
@@ -437,52 +375,57 @@
         });
       }
 
-      function addOneAdmin(b) {
-        const safeId = b.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '_');
+      async function addOneAdmin(b) {
+        const safeId = b.replace(/[^a-zA-Z0-9]/g, '_');
         const input = document.getElementById(`in-${safeId}`);
         const val = input ? input.value.trim() : "";
-        if (val) {
-          if (!MASTER_DATA[b].includes(val)) {
-            MASTER_DATA[b].push(val);
-          }
-          syncToCloud();
-          renderAdmin();
-          // Refresh badge jika bidang ini sedang aktif
-          if (currentBidang === b) renderDBBadges();
-          populateBidang();
-        }
+        if (!val || MASTER_DATA[b].includes(val)) return;
+        MASTER_DATA[b].push(val);
+        if (input) input.value = "";
+        renderAdmin();
+        if (currentBidang === b) renderDBBadges();
+        await syncToCloud();
       }
 
-      function removeName(b, i) {
-        const removedName = MASTER_DATA[b][i];
+      async function removeName(b, i) {
+        const removed = MASTER_DATA[b][i];
         MASTER_DATA[b].splice(i, 1);
-        syncToCloud();
         renderAdmin();
-        // Jika nama yang dihapus ada di selectedNames, hapus juga
-        const selIdx = selectedNames.indexOf(removedName);
+        const selIdx = selectedNames.indexOf(removed);
         if (selIdx !== -1) selectedNames.splice(selIdx, 1);
         if (currentBidang === b) renderDBBadges();
         renderPills();
+        await syncToCloud();
       }
 
-      function deleteBidang(b) {
-        if (confirm("Hapus bidang " + b + " beserta semua nama karyawannya?")) {
-          delete MASTER_DATA[b];
-          syncToCloud();
-          renderAdmin();
-          populateBidang();
-          if (currentBidang === b) {
-            currentBidang = "";
-            selectedNames = [];
-            document.getElementById('panelNamaDB').classList.add('hidden');
-            renderPills();
-          }
+      async function deleteBidang(b) {
+        if (!confirm("Hapus bidang " + b + " beserta semua nama?")) return;
+        delete MASTER_DATA[b];
+        renderAdmin();
+        populateBidang();
+        if (currentBidang === b) {
+          currentBidang = "";
+          selectedNames = [];
+          document.getElementById('panelNamaDB').classList.add('hidden');
+          renderPills();
         }
+        await syncToCloud();
       }
 
-      // ==========================================
-      // JAM DIGITAL
-      // ==========================================
+      // =============================================
+      // LOADER HELPER
+      // =============================================
+      function showLoader(text) {
+        document.getElementById('loaderText').textContent = text || "Memproses...";
+        document.getElementById('loader').classList.remove('hidden');
+      }
+      function hideLoader() {
+        document.getElementById('loader').classList.add('hidden');
+      }
+
+      // =============================================
+      // JAM
+      // =============================================
       function updateClock() {
         document.getElementById('clock').innerHTML = new Date().toLocaleString('id-ID', {
           weekday: 'long', day: '2-digit', month: 'long', year: 'numeric',
