@@ -44,7 +44,6 @@
           </select>
         </div>
 
-        <!-- Daftar nama (langsung dari database + bisa hapus + tambah manual) -->
         <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
           <div class="flex justify-between items-center mb-3">
             <span class="text-[10px] font-bold text-blue-800 uppercase tracking-wider">Daftar Nama</span>
@@ -90,7 +89,7 @@
         </div>
       </div>
 
-      <!-- LOADER (hanya untuk kirim pesanan) -->
+      <!-- LOADER -->
       <div id="loader" class="hidden fixed inset-0 bg-white bg-opacity-80 z-[110] flex flex-col items-center justify-center text-center">
         <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
         <p class="mt-2 text-blue-600 text-[10px] font-bold uppercase" id="loaderText">Mengirim...</p>
@@ -98,18 +97,20 @@
     </div>
 
     <script>
-      const GAS_URL = "https://script.google.com/macros/s/AKfycbzHdX5ilJlA18X_BQtRN9x93CSm88mBkF9E-SHq-oIGobWCviIsEQpBlc8fIZjXcG_b/exec";
+      const GAS_URL = "https://script.google.com/macros/s/AKfycbxS_drQQ2fp_NLwEZNk7u-fwIcQvEkhuGA8_U1q71hpd9tR9ZZmuCfX4tnuIbXdDPsB/exec";
 
       let MASTER_DATA = {};
       let selectedNames = [];
       let isAuth = false;
 
       // =============================================
-      // LOAD DATA — langsung render tanpa loader UI
+      // LOAD DATA
+      // Gunakan no-cors untuk GET juga agar konsisten,
+      // tapi karena GET butuh response, tetap pakai cors
+      // dengan try/catch yang lebih baik
       // =============================================
       window.onload = () => {
         updateClock();
-        // Fetch di background, UI tetap jalan
         fetch(`${GAS_URL}?action=getMasterData`, { redirect: "follow" })
           .then(r => r.json())
           .then(data => {
@@ -119,11 +120,15 @@
           .catch(err => console.error("Gagal load:", err));
       };
 
-      // Sync ke cloud di background — UI ga nunggu
+      // =============================================
+      // SYNC KE CLOUD — fire and forget pakai no-cors
+      // no-cors: browser ga blok, response opaque (ok)
+      // =============================================
       function syncToCloud() {
         fetch(GAS_URL, {
           method: "POST",
           redirect: "follow",
+          mode: "no-cors", // FIX: hindari CORS error untuk write
           headers: { "Content-Type": "text/plain" },
           body: JSON.stringify({ action: "saveMasterData", data: MASTER_DATA })
         }).catch(err => console.error("Gagal sync:", err));
@@ -166,18 +171,14 @@
         });
       }
 
-      // =============================================
-      // PILIH BIDANG → semua nama dari DB langsung masuk
-      // =============================================
       function handleBidangChange() {
         const bidang = document.getElementById('bidang').value;
-        // Langsung copy semua nama dari database ke selectedNames
         selectedNames = [...(MASTER_DATA[bidang] || [])];
         renderPills();
       }
 
       // =============================================
-      // RENDER PILLS — bisa hapus tiap nama
+      // RENDER PILLS
       // =============================================
       function renderPills() {
         const cont = document.getElementById('nameContainer');
@@ -192,7 +193,6 @@
             </div>`;
         });
 
-        // Input tambah manual
         cont.innerHTML += `
           <div class="flex gap-1 items-center">
             <input type="text" id="manualInput"
@@ -214,6 +214,9 @@
 
       // =============================================
       // KIRIM PESANAN
+      // FIX BUG 1: Pakai no-cors agar ga "Failed to fetch"
+      // Karena no-cors response opaque, kita anggap sukses
+      // kalau tidak ada network error sama sekali
       // =============================================
       function handleSubmit() {
         const pic = document.getElementById('picName').value.trim();
@@ -230,11 +233,16 @@
         fetch(GAS_URL, {
           method: "POST",
           redirect: "follow",
+          mode: "no-cors", // FIX: pakai no-cors, response akan opaque tapi tidak error
           headers: { "Content-Type": "text/plain" },
-          body: JSON.stringify({ action: "processForm", data: { pic, phone, bidang, shift, names: selectedNames } })
+          body: JSON.stringify({
+            action: "processForm",
+            data: { pic, phone, bidang, shift, names: selectedNames }
+          })
         })
-        .then(r => r.json())
         .then(() => {
+          // no-cors response selalu opaque (tidak bisa dibaca),
+          // tapi kalau sampai sini berarti request berhasil terkirim
           document.getElementById('loader').classList.add('hidden');
           alert(`TERKIRIM! ✅\n${selectedNames.length} nasi untuk ${shift}`);
           selectedNames = [];
@@ -244,8 +252,9 @@
           document.getElementById('bidang').value = "";
         })
         .catch(err => {
+          // Hanya masuk sini kalau benar-benar network error (offline, dll)
           document.getElementById('loader').classList.add('hidden');
-          alert("Gagal kirim: " + err.message);
+          alert("Gagal kirim (cek koneksi): " + err.message);
         });
       }
 
@@ -277,7 +286,7 @@
         document.getElementById('bulkInput').value = "";
         renderAdmin();
         populateBidang();
-        syncToCloud(); // background, ga nunggu
+        syncToCloud();
         alert(`✅ ${added} nama ditambahkan!`);
       }
 
